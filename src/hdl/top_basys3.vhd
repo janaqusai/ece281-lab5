@@ -62,6 +62,8 @@ architecture top_basys3_arch of top_basys3 is
         signal f_registerB : unsigned(7 downto 0) := "00000000";
         signal f_state : std_logic_vector(3 downto 0) := "1000";
         signal f_state_next : std_logic_vector(3 downto 0) := "1000";
+        
+        signal w_sign2 : std_logic;
 
 component clock_divider is
 	generic ( constant k_DIV : natural := 2	); -- How many clk cycles until slow clock toggles
@@ -89,7 +91,7 @@ end component TDM4;
 component twoscomp_decimal is
     port (
         i_binary: in std_logic_vector(7 downto 0);
-        o_negative: out std_logic_vector(3 downto 0);
+        o_negative: out std_logic;
         o_hundreds: out std_logic_vector(3 downto 0);
         o_tens: out std_logic_vector(3 downto 0);
         o_ones: out std_logic_vector(3 downto 0)
@@ -158,7 +160,7 @@ SSD_inst : sevenSegDecoder port map (
           
 twoscomp_inst : twoscomp_decimal port map (
                   i_binary => w_bin,
-                  o_negative => w_sign,
+                  o_negative => w_sign2,
                   o_hundreds => w_hund,
                   o_tens => w_tens,
                   o_ones => w_ones
@@ -209,5 +211,7 @@ w_bin <= std_logic_vector(f_registerA) when (f_state(1 downto 0) = "00") else --
          std_logic_vector(f_registerB) when (f_state(1 downto 0) = "10") else -- S2
          w_result when (f_state(1 downto 0) = "01");
 
+w_sign <= x"a" when (w_sign2 = '1') else
+           x"b";
 
 end top_basys3_arch;
